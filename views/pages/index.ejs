@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Proyecto plena inclusión</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        padding-top: 50px;
+      }
+    </style>
+  </head>
+  <body class="container">
+    <main>
+      <div class="form">
+        <form action="/register" method="post">
+          <h1>Registro de usuario</h1>
+          Username: <input type="text" name="username" value="" /><br /><br />
+          Password: <input type="text" name="password" value="" /><br /><br />
+          Confirma contraseña:
+          <input type="text" name="confPassword" value="" /><br /><br />
+          <input type="submit" value="Registrar" /><br /><br />
+          <hr />
+        </form>
+        <h1>Añadir actividades</h1>
+        <form action="/addActivity" method="post">
+          Nombre: <input type="text" name="name" value="" /><br /><br />
+          Fecha: <input type="date" name="date" value="" /><br /><br />
+          <input type="submit" value="Añadir" /><br /><br />
+          <hr />
+        </form>
+        <form action="/addUserActivity" method="post">
+          <h1>Apuntar usuario a actividad</h1>
+          IDNombre: <input type="text" name="idUser" value="" /><br /><br />
+          IDActividad:
+          <input type="text" name="idActivity" value="" /><br /><br />
+          <input type="submit" value="Enviar" /><br /><br />
+          <hr />
+        </form>
+        <form action="/getUsers" method="post">
+          <h1>Mostrar usuarios</h1>
+          <input type="submit" value="mostrar" />
+          <hr />
+        </form>
+        <form action="/getActivities" method="post">
+          <h1>Mostrar actividades</h1>
+          <input type="submit" value="mostrar" />
+          <hr />
+        </form>
+      </div>
+    </main>
+    <footer>
+      <p class="text-center text-muted">© Copyright 2023</p>
+    </footer>
+  </body>
+</html>
