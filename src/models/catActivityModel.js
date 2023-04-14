@@ -1,20 +1,20 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
-import User from "./userModel.js";
 import Activity from "./activityModel.js";
+import Category from "./categoryModel.js";
 const { DataTypes } = Sequelize;
-const UserActivity = db.define("UserActivity", {
-  UserId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: User,
-      key: "id",
-    },
-  },
+const CatActivity = db.define("CatActivity", {
   ActivityId: {
     type: DataTypes.INTEGER,
     references: {
       model: Activity,
+      key: "id",
+    },
+  },
+  CategoryId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Category,
       key: "id",
     },
   },
@@ -24,4 +24,4 @@ const UserActivity = db.define("UserActivity", {
   await db.sync();
 })();
 
-export default UserActivity;
+export default CatActivity;
