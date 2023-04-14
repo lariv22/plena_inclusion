@@ -82,6 +82,14 @@
           <input type="submit" value="Añadir" /><br /><br />
           <hr />
         </form>
+        <h1>Buscar actividades por fecha</h1>
+        <form action="/getActivitiesDate" method="post">
+          Fecha inicio:
+          <input type="date" name="dateStart" value="" /><br /><br />
+          Fecha final: <input type="date" name="dateEnd" value="" /><br /><br />
+          <input type="submit" value="Buscar actividades" /><br /><br />
+          <hr />
+        </form>
         <form action="/addUserActivity" method="post">
           <h1>Apuntar usuario a actividad</h1>
           IDNombre: <input type="text" name="idUser" value="" /><br /><br />

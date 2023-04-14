@@ -28,7 +28,7 @@ const Users = db.define(
       type: DataTypes.STRING(60),
     },
     birthday: {
-      type: DataTypes.ONLYDATE,
+      type: DataTypes.DATEONLY,
     },
     address: {
       type: DataTypes.STRING(150),

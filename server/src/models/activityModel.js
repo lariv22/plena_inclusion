@@ -12,17 +12,17 @@ const Activities = db.define(
     description: {
       type: DataTypes.TEXT,
     },
-    image_URL: {
+    imageURL: {
       type: DataTypes.STRING,
     },
-    id_creator: {
+    idCreator: {
       type: DataTypes.STRING,
     },
-    date_start: {
-      type: DataTypes.DATE,
+    dateStart: {
+      type: DataTypes.DATEONLY,
     },
-    date_end: {
-      type: DataTypes.DATE,
+    dateEnd: {
+      type: DataTypes.DATEONLY,
     },
   },
   {

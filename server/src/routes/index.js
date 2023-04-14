@@ -1,8 +1,12 @@
 import express from "express";
-import { AddActivity, GetActivities } from "../controllers/activities.js";
+import {
+  AddActivity,
+  GetActivities,
+  GetActivitiesDate,
+} from "../controllers/activities.js";
 import { GetUsers } from "../controllers/users.js";
 import { AddUser } from "../controllers/users.js";
-import { AddUserActivity } from "../controllers/participantsReps.js";
+//import { AddUserActivity } from "../controllers/participantsReps.js";
 import { AddDisability, GetDisabilities } from "../controllers/disabilities.js";
 import { AddCategory, GetCategories } from "../controllers/categories.js";
 import { AddRepetition, GetRepetitions } from "../controllers/repetitions.js";
@@ -21,8 +25,7 @@ router.post("/getUsers", GetUsers);
 
 router.post("/addActivity", AddActivity);
 router.post("/getActivities", GetActivities);
-
-router.post("/addUserActivity", AddUserActivity);
+router.post("/getActivitiesDate", GetActivitiesDate);
 
 router.post("/addDisability", AddDisability);
 router.post("/getDisabilities", GetDisabilities);
@@ -30,8 +33,8 @@ router.post("/getDisabilities", GetDisabilities);
 router.post("/addCategory", AddCategory);
 router.post("/getCategories", GetCategories);
 
-router.post("/addRepetition", AddRepetition);
-router.post("/getRepetitions", GetRepetitions);
+//router.post("/addRepetition", AddRepetition);
+//router.post("/getRepetitions", GetRepetitions);
 
 router.post("/addProfessional", AddProfessional);
 router.post("/getProfessionals", GetProfessionals);
