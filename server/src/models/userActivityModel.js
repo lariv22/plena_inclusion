@@ -1,20 +1,20 @@
 import { Sequelize } from "sequelize";
 import db from "../config/database.js";
-import Participant from "./participantModel.js";
-import Repetition from "./repetitionModel.js";
+import User from "./userModel.js";
+import Activity from "./activityModel.js";
 const { DataTypes } = Sequelize;
-const ParticipantRep = db.define("ParticipantRep", {
-  ParticipantId: {
+const UserActivity = db.define("UserActivity", {
+  UserId: {
     type: DataTypes.INTEGER,
     references: {
-      model: Participant,
+      model: User,
       key: "id",
     },
   },
-  RepetitionId: {
+  ActivityId: {
     type: DataTypes.INTEGER,
     references: {
-      model: Repetition,
+      model: Activity,
       key: "id",
     },
   },
@@ -24,4 +24,4 @@ const ParticipantRep = db.define("ParticipantRep", {
   await db.sync();
 })();
 
-export default ParticipantRep;
+export default UserActivity;

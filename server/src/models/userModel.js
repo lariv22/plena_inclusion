@@ -21,19 +21,22 @@ const Users = db.define(
     gender: {
       type: DataTypes.STRING(10),
     },
-    phone: {
+    phoneNumber: {
       type: DataTypes.INTEGER(9),
     },
     email: {
       type: DataTypes.STRING(60),
     },
-    birthday: {
+    birthDate: {
       type: DataTypes.DATEONLY,
     },
     address: {
       type: DataTypes.STRING(150),
     },
-    termination_date: {
+    registrationDate: {
+      type: DataTypes.DATE,
+    },
+    terminationDate: {
       type: DataTypes.DATE,
     },
     password: {

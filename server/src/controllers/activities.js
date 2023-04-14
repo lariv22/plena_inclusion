@@ -1,4 +1,5 @@
 import Activities from "../models/activityModel.js";
+import { Op } from "sequelize";
 
 export const GetActivities = async (req, res) => {
   try {
@@ -28,9 +29,11 @@ export const GetActivitiesDate = async (req, res) => {
   try {
     const { dateStart, dateEnd } = req.body;
     const activities = await Activities.findAll({
-      attributes: ["id", "name", "date"],
+      attributes: ["id", "name", "dateStart", "dateEnd"],
       where: {
-        dateStart: between[(dateStart, dateEnd)],
+        dateStart: {
+          [Op.between]: [dateStart, dateEnd],
+        },
       },
     });
     res.json(activities);
@@ -47,6 +50,20 @@ export const DeleteActivity = async (req, res) => {
       },
     });
     res.json({ msg: "Actividad borrada con éxito" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const UpdateActivity = async (req, res) => {
+  const { id, name, date } = req.body;
+  try {
+    await Activities.upsert({
+      id: id,
+      name: name,
+      date: date,
+    });
+    res.json({ msg: "Actividad editada con éxito" });
   } catch (error) {
     console.log(error);
   }

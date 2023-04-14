@@ -4,18 +4,27 @@ import User from "./userModel.js";
 
 const { DataTypes } = Sequelize;
 
-const Professionals = db.define('professionals',{
-    speciality:{
-        type: DataTypes.STRING
-    }
-},{
-    freezeTableName: true
-});
-
-Professionals.belongsTo(User, { foreignKey: "id", targetKey: "id" });
+const Professionals = db.define(
+  "professionals",
+  {
+    idUser: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    speciality: {
+      type: DataTypes.STRING,
+    },
+  },
+  {
+    freezeTableName: true,
+  }
+);
 
 (async () => {
-    await db.sync();
+  await db.sync();
 })();
 
 export default Professionals;
