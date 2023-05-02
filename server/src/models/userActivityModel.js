@@ -5,14 +5,14 @@ import Activity from "./activityModel.js";
 const { DataTypes } = Sequelize;
 const UserActivity = db.define("UserActivity", {
   UserId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: "id",
     },
   },
   ActivityId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: Activity,
       key: "id",

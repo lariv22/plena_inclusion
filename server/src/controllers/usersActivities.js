@@ -1,4 +1,7 @@
 import UserActivity from "../models/userActivityModel.js";
+import Activity from "../models/activityModel.js";
+import { Op } from "sequelize";
+import { Sequelize } from "sequelize";
 
 export const AddUserActivity = async (req, res) => {
   const { idUser, idActivity } = req.body;
@@ -13,16 +16,80 @@ export const AddUserActivity = async (req, res) => {
   }
 };
 
-export const GetActivitiesByUser = async (req, res) => {
-  const { idUser } = req.body;
+export const GetActivitiesAvailableForUser = async (req, res) => {
+  const id = req.body.userId;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+  const arrayActivities = [];
   try {
-    const activities = await UserActivity.findAll({
+    const activities = await Activity.findAll({
       attributes: ["id", "name", "dateStart", "dateEnd"],
       where: {
-        id: idUser,
+        dateStart: {
+          [Sequelize.Op.between]: [startDate, endDate],
+        },
       },
     });
-    res.json(activities);
+    const activitiesUser = await UserActivity.findAll({
+      attributes: ["ActivityId"],
+      where: {
+        UserId: id,
+      },
+    });
+    for (let i = 0; i < activities.length; i++) {
+      let contador = 0;
+      for (let j = 0; j < activitiesUser.length; j++) {
+        if (activitiesUser[j].ActivityId != activities[i].id) {
+          contador++;
+        }
+      }
+      if (contador == activitiesUser.length) {
+        arrayActivities.push(activities[i]);
+      }
+    }
+    arrayActivities.sort(function (a, b) {
+      var c = new Date(a.dateStart);
+      var d = new Date(b.dateStart);
+      return c - d;
+    });
+    res.json({ arrayActivities });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const GetActivitiesOfUser = async (req, res) => {
+  const userId = req.body.userId;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+  const arrayActivities = [];
+  try {
+    const activities = await UserActivity.findAll({
+      attributes: ["ActivityId"],
+      where: {
+        UserId: userId,
+      },
+    });
+    for (let i = 0; i < activities.length; i++) {
+      const subActivities = await Activity.findOne({
+        attributes: ["id", "name", "dateStart", "dateEnd"],
+        where: {
+          id: activities[i].ActivityId,
+          dateStart: {
+            [Sequelize.Op.between]: [startDate, endDate],
+          },
+        },
+      });
+      if (subActivities !== null) {
+        arrayActivities.push(subActivities);
+      }
+    }
+    arrayActivities.sort(function (a, b) {
+      var c = new Date(a.dateStart);
+      var d = new Date(b.dateStart);
+      return c - d;
+    });
+    res.json({ arrayActivities });
   } catch (error) {
     console.log(error);
   }

@@ -6,11 +6,18 @@ import {
   UpdateActivity,
 } from "../controllers/activities.js";
 import {
-  GetActivitiesByUser,
   AddUserActivity,
   DeleteUserActivity,
+  GetActivitiesOfUser,
+  GetActivitiesAvailableForUser,
 } from "../controllers/usersActivities.js";
-import { GetUsers } from "../controllers/users.js";
+import {
+  GetUsers,
+  Login,
+  GetUserData,
+  UpdatePasswordUser,
+  UpdateEmailUser,
+} from "../controllers/users.js";
 import {
   AddParticipant,
   GetParticipants,
@@ -46,16 +53,21 @@ router.post("/getParticipants", GetParticipants);
 router.post("/deleteParticipant", DeleteParticipant);
 router.post("/updateParticipant", UpdateParticipant);
 
+router.post("/login", Login);
 router.post("/getUsers", GetUsers);
+router.post("/getUserData", GetUserData);
+router.post("/updatePasswordUser", UpdatePasswordUser);
+router.post("/updateEmailUser", UpdateEmailUser);
 
 router.post("/addActivity", AddActivity);
 router.post("/getActivities", GetActivities);
 router.post("/getActivitiesDate", GetActivitiesDate);
 router.post("/updateActivity", UpdateActivity);
 
-router.post("/getActivitiesByUser", GetActivitiesByUser);
+router.post("/getActivitiesOfUser", GetActivitiesOfUser);
 router.post("/addUserActivity", AddUserActivity);
 router.post("/deleteUserActivity", DeleteUserActivity);
+router.post("/getActivitiesAvailableForUser", GetActivitiesAvailableForUser);
 
 router.post("/addCategory", AddCategory);
 router.post("/getCategories", GetCategories);

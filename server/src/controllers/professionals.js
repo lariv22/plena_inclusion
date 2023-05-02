@@ -34,7 +34,7 @@ export const UpdateProfessional = async (req, res) => {
       name: name,
       speciality: speciality,
     });
-    res.json({ msg: "Profesional editada con éxito" });
+    res.json({ msg: "Profesional editado con éxito" });
   } catch (error) {
     console.log(error);
   }
