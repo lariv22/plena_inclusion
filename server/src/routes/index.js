@@ -42,6 +42,8 @@ import {
   DeleteProfessional,
   UpdateProfessional,
 } from "../controllers/professionals.js";
+import { verifyToken } from "../middleware/VerifyToken.js";
+import { refreshToken } from "../controllers/refreshToken.js";
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -54,8 +56,9 @@ router.post("/deleteParticipant", DeleteParticipant);
 router.post("/updateParticipant", UpdateParticipant);
 
 router.post("/login", Login);
+router.post("/refreshToken", refreshToken);
 router.post("/getUsers", GetUsers);
-router.post("/getUserData", GetUserData);
+router.post("/getUserData", verifyToken, GetUserData);
 router.post("/updatePasswordUser", UpdatePasswordUser);
 router.post("/updateEmailUser", UpdateEmailUser);
 

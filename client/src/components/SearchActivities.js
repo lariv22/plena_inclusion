@@ -50,9 +50,11 @@ const SearchActivities = () => {
 
   const GetActivitiesAvailableForUserWeek = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
     const response = await axios
       .post("/getActivitiesAvailableForUser", {
-        userId: id,
+        userId,
         startDate: startDate,
         endDate: endDate,
       })
@@ -63,9 +65,11 @@ const SearchActivities = () => {
 
   const GetActivitiesAvailableForUserDates = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
     const response = await axios
       .post("/getActivitiesAvailableForUser", {
-        userId: idUser,
+        userId,
         startDate: newStartDate,
         endDate: newEndDate,
       })
@@ -94,13 +98,6 @@ const SearchActivities = () => {
               className="d-flex"
               onSubmit={GetActivitiesAvailableForUserWeek}
             >
-              <Form.Control
-                className="me-2"
-                type="text"
-                placeholder="Id de usuario"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-              />
               <Button
                 className="button is-success is-fullwidth"
                 variant="outline-success"
@@ -148,13 +145,6 @@ const SearchActivities = () => {
               className="d-flex"
               onSubmit={GetActivitiesAvailableForUserDates}
             >
-              <Form.Control
-                className="me-2"
-                type="text"
-                placeholder="Id de usuario"
-                value={idUser}
-                onChange={(e) => setIdUser(e.target.value)}
-              />
               <Form.Control
                 className="me-2"
                 type="date"

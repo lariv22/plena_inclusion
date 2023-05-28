@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -17,9 +17,9 @@ const Login = () => {
           password: password,
         })
         .then((response) => {
-          alert(response.data.msg);
+          localStorage.setItem("accessToken", response.data.accessToken);
+          history("/dashboard");
         });
-      history("/dashboard");
     } catch (error) {
       if (error.response) {
         setMsg(error.response.data.msg);

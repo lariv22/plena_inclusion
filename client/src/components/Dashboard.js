@@ -48,9 +48,11 @@ const Dashboard = () => {
 
   const GetActivitiesOfUserWeek = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
     const response = await axios
       .post("/getActivitiesOfUser", {
-        userId: id,
+        userId,
         startDate: startDate,
         endDate: endDate,
       })
@@ -61,9 +63,11 @@ const Dashboard = () => {
 
   const GetActivitiesOfUserDates = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
     const response = await axios
       .post("/getActivitiesOfUser", {
-        userId: idUser,
+        userId,
         startDate: newStartDate,
         endDate: newEndDate,
       })
@@ -89,13 +93,6 @@ const Dashboard = () => {
               navbarScroll
             ></Nav>
             <Form className="d-flex" onSubmit={GetActivitiesOfUserWeek}>
-              <Form.Control
-                className="me-2"
-                type="text"
-                placeholder="Id de usuario"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-              />
               <Button
                 className="button is-success is-fullwidth"
                 variant="outline-success"
@@ -140,13 +137,6 @@ const Dashboard = () => {
               navbarScroll
             ></Nav>
             <Form className="d-flex" onSubmit={GetActivitiesOfUserDates}>
-              <Form.Control
-                className="me-2"
-                type="text"
-                placeholder="Id de usuario"
-                value={idUser}
-                onChange={(e) => setIdUser(e.target.value)}
-              />
               <Form.Control
                 className="me-2"
                 type="date"

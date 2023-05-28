@@ -1,5 +1,6 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const GetUsers = async (req, res) => {
   try {
@@ -38,21 +39,48 @@ export const GetUserData = async (req, res) => {
 };
 
 export const Login = async (req, res) => {
-  const { email, password } = req.body;
+  console.log("......");
   try {
-    const user = await User.findOne({ where: { email: email } });
-    if (user) {
-      const password_valid = await bcrypt.compare(password, user.password);
-      if (password_valid) {
-        res.status(200).json({ msg: "Password Correct" });
-      } else {
-        res.status(400).json({ msg: "Password Incorrect" });
+    const { dataValues } = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
+    const user = dataValues;
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (!match) return res.status(400).json({ msg: "Wrong Password" });
+    const userId = user.id;
+    const name = user.name;
+    const email = user.email;
+    const accessToken = jwt.sign(
+      { userId, name, email },
+      "jsfgfjguwrg8783wgbjs849h2fu3cnsvh8wyr8fhwfvi2g225",
+      {
+        expiresIn: "15s",
       }
-    } else {
-      res.status(404).json({ msg: "User does not exist" });
-    }
-  } catch (msg) {
-    console.log(msg);
+    );
+    const refreshToken = jwt.sign(
+      { userId, name, email },
+      "825y8i3hnfjmsbv7gwajbl7fobqrjfvbs7gbfj2q3bgh8f42",
+      {
+        expiresIn: "1d",
+      }
+    );
+    await User.update(
+      { refresh_token: refreshToken },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ accessToken });
+  } catch (error) {
+    res.status(404).json({ msg: "Email not found" });
   }
 };
 
@@ -63,11 +91,19 @@ export const UpdateEmailUser = async (req, res) => {
       .status(400)
       .json({ msg: "Los correos electrónicos no coinciden." });
   try {
-    await User.upsert({
-      id: id,
-      email: email,
-    });
-    res.json({ msg: "Email actualizado con éxito" });
+    const user = await User.update(
+      { email },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    if (user) {
+      res.json({ msg: "Email actualizado con éxito" });
+    } else {
+      res.json({ msg: "El email no se ha podido actualizar" });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -80,10 +116,14 @@ export const UpdatePasswordUser = async (req, res) => {
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
-    await User.upsert({
-      id: id,
-      password: hashPassword,
-    });
+    const user = await User.update(
+      { password: hashPassword },
+      {
+        where: {
+          id,
+        },
+      }
+    );
     res.json({ msg: "Contraseña actualizada con éxito" });
   } catch (error) {
     console.log(error);
