@@ -33,6 +33,15 @@ const User = db.define(
     address: {
       type: DataTypes.STRING(150),
     },
+    special_needs: {
+      type: DataTypes.BOOLEAN,
+    },
+    emerg_number: {
+      type: DataTypes.INTEGER(9),
+    },
+    disability: {
+      type: DataTypes.STRING(40),
+    },
     registrationDate: {
       type: DataTypes.DATE,
     },

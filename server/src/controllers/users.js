@@ -1,13 +1,31 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
-export const GetUsers = async (req, res) => {
+export const AddUser = async (req, res) => {
   try {
-    const users = await User.findAll({
-      attributes: ["id", "name", "password"],
+    const passwordUser = crypto.randomBytes(5).toString("hex");
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(passwordUser, salt);
+    const newUser = await User.create({
+      name: req.body.name,
+      surname1: req.body.surname1,
+      surname2: req.body.surname2,
+      DNI: req.body.DNI,
+      gender: req.body.gender,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      birthDate: req.body.birthDate,
+      address: req.body.address,
+      special_needs: req.body.special_needs,
+      emerg_number: req.body.emerg_number,
+      disability: req.body.disability,
+      password: hashPassword,
     });
-    res.json(users);
+    res.json({
+      msg: "Registrado exitosamente. Tu contraseña es: " + passwordUser,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -27,6 +45,9 @@ export const GetUserData = async (req, res) => {
         "email",
         "birthDate",
         "address",
+        "special_needs",
+        "emerg_number",
+        "disability",
       ],
       where: {
         id: req.body.id,
@@ -39,7 +60,6 @@ export const GetUserData = async (req, res) => {
 };
 
 export const Login = async (req, res) => {
-  console.log("......");
   try {
     const { dataValues } = await User.findOne({
       where: {
@@ -48,7 +68,7 @@ export const Login = async (req, res) => {
     });
     const user = dataValues;
     const match = await bcrypt.compare(req.body.password, user.password);
-    if (!match) return res.status(400).json({ msg: "Wrong Password" });
+    if (!match) return res.status(400).json({ msg: "Contraseña incorrecta" });
     const userId = user.id;
     const name = user.name;
     const email = user.email;
@@ -112,7 +132,7 @@ export const UpdateEmailUser = async (req, res) => {
 export const UpdatePasswordUser = async (req, res) => {
   const { id, password, confPassword } = req.body;
   if (password !== confPassword)
-    return res.status(400).json({ msg: "Las contraseñas no coinciden." });
+    return res.status(400).json({ msg: "Las contraseñas no coinciden" });
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
