@@ -21,6 +21,9 @@ const Profile = () => {
   const [msg, setMsg] = useState("");
   const history = useNavigate();
   const [ready, setReady] = useState(false);
+  const [expire, setExpire] = useState("");
+
+  const navigation = useNavigate();
 
   useEffect(() => {
     let mounted = true;
@@ -71,6 +74,44 @@ const Profile = () => {
     return () => (mounted = false);
   }, []);
 
+  const refreshToken = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/refreshToken");
+      localStorage.setItem("accessToken", response.data.accessToken);
+      console.log(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setExpire(decoded.exp);
+      return Promise.resolve();
+    } catch (error) {
+      if (error.response) {
+        navigation("/");
+      }
+    }
+  };
+
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      const token = localStorage.getItem("accessToken");
+      if (expire * 1000 < currentDate.getTime() || expire == undefined) {
+        config.headers.Authorization = `Bearer ${token}`;
+        const decoded = jwt_decode(token);
+        config.params = {
+          userId: decoded.userId,
+        };
+        setExpire(decoded.exp);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
   const Logout = async (e) => {
     e.preventDefault();
     try {
@@ -91,7 +132,7 @@ const Profile = () => {
     const { userId } = jwt_decode(token);
     if (window.confirm("¿Seguro que quieres cambiar el email?")) {
       try {
-        await axios
+        const response = await axiosJWT
           .post("/updateEmailUser", {
             id: userId,
             email: email,
@@ -99,6 +140,15 @@ const Profile = () => {
           })
           .then((response) => {
             alert(response.data.msg);
+          })
+          .catch(async (error) => {
+            if (error.response) {
+              setMsg(error.response.data.msg);
+            }
+            if (error.response.status === 403) {
+              const RT = await refreshToken();
+              UpdateEmail(new Event("click"));
+            }
           });
       } catch (error) {
         if (error.response) {
@@ -114,7 +164,7 @@ const Profile = () => {
     const { userId } = jwt_decode(token);
     if (window.confirm("¿Seguro que quieres cambiar la contraseña?")) {
       try {
-        await axios
+        const response = await axiosJWT
           .post("/updatePasswordUser", {
             id: userId,
             password: password,
@@ -122,6 +172,15 @@ const Profile = () => {
           })
           .then((response) => {
             alert(response.data.msg);
+          })
+          .catch(async (error) => {
+            if (error.response) {
+              setMsg(error.response.data.msg);
+            }
+            if (error.response.status === 403) {
+              const RT = await refreshToken();
+              UpdatePassword(new Event("click"));
+            }
           });
       } catch (error) {
         if (error.response) {

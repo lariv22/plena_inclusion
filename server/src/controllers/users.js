@@ -193,6 +193,7 @@ export const EnviarEmailBienvenida = async (email, passwordUser) => {
         passwordUser +
         ".",
     };
+    console.log(passwordUser);
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

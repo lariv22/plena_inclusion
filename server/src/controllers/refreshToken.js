@@ -23,7 +23,7 @@ export const refreshToken = async (req, res) => {
           { userId: idUser, name, email },
           "jsfgfjguwrg8783wgbjs849h2fu3cnsvh8wyr8fhwfvi2g225",
           {
-            expiresIn: "15s",
+            expiresIn: "500s",
           }
         );
         res.json({ accessToken });

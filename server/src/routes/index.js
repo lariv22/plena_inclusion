@@ -39,12 +39,12 @@ router.delete("/logout", Logout);
 
 router.post("/addUser", AddUser);
 router.get("/refreshToken", refreshToken);
-router.get("/getUserData", verifyToken, GetUserData);
+router.post("/getUserData", verifyToken, GetUserData);
 router.post("/updatePasswordUser", verifyToken, UpdatePasswordUser);
 router.post("/updateEmailUser", verifyToken, UpdateEmailUser);
 
-router.get("/getActivities", verifyToken, GetActivities);
-router.get("/getActivitiesDate", verifyToken, GetActivitiesDate);
+router.post("/getActivities", verifyToken, GetActivities);
+router.post("/getActivitiesDate", verifyToken, GetActivitiesDate);
 
 router.post("/getActivitiesOfUser", verifyToken, GetActivitiesOfUser);
 router.post("/addUserActivity", verifyToken, AddUserActivity);
@@ -55,7 +55,7 @@ router.post(
   GetActivitiesAvailableForUser
 );
 
-router.get("/getCategories", GetCategories);
+router.post("/getCategories", GetCategories);
 
 router.post("/addCatActivity", AddCatActivity);
 router.post("/deleteCatActivity", DeleteCatActivity);

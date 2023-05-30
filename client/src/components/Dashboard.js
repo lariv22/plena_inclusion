@@ -89,7 +89,7 @@ const Dashboard = () => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
-    const response = await axios
+    const response = await axiosJWT
       .post("/getActivitiesOfUser", {
         userId,
         startDate: startDate,
@@ -113,7 +113,7 @@ const Dashboard = () => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
-    const response = await axios
+    const response = await axiosJWT
       .post(
         "/getActivitiesOfUser",
         {

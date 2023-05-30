@@ -23,6 +23,7 @@ function NavBar() {
             <Nav.Link href="/SearchActivities">Buscar actividades</Nav.Link>
             <Nav.Link href="/Register">Registrar</Nav.Link>
             <Nav.Link href="/Profile">Perfil</Nav.Link>
+            <Nav.Link href="/Login">Login</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
