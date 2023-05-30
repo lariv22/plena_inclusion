@@ -8,7 +8,7 @@ const Login = () => {
   const [msg, setMsg] = useState("");
   const history = useNavigate();
 
-  const Auth = async (e) => {
+  const LoginUser = async (e) => {
     e.preventDefault();
     try {
       await axios
@@ -33,31 +33,32 @@ const Login = () => {
         <div className="container">
           <div className="columns is-centered">
             <div className="column is-4-desktop">
-              <form onSubmit={Auth} className="box">
+              <form onSubmit={LoginUser} className="box">
                 <div className="field mt-5 has-text-centered">
                   <p className="has-text-centered" style={{ fontSize: 45 }}>
-                    PlenaInclusión
+                    Plena Inclusión
+                  </p>
+                  <p className="has-text-centered" style={{ fontSize: 30 }}>
+                    Inicio de sesión
                   </p>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Email</label>
                   <div className="controls">
                     <input
                       type="text"
                       className="input"
-                      placeholder="Username"
+                      placeholder="Email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Password</label>
                   <div className="controls">
                     <input
                       type="password"
                       className="input"
-                      placeholder="******"
+                      placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
@@ -70,6 +71,11 @@ const Login = () => {
                   >
                     Login
                   </button>
+                </div>
+                <div className="links">
+                  <a className="link" href="/Register">
+                    ¿Aún no tienes una cuenta?
+                  </a>
                 </div>
               </form>
             </div>

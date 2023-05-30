@@ -1,0 +1,17 @@
+div.links {
+  text-align: center;
+}
+a.link:link {
+  color: #2da635;
+  text-decoration: none;
+}
+a.link:visited {
+  color: #919191;
+  text-decoration: none;
+}
+a.link:hover {
+  opacity: 1;
+  transition: 0.5s;
+  color: #027333;
+  text-decoration: none;
+}

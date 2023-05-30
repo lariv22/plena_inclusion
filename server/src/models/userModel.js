@@ -54,6 +54,9 @@ const User = db.define(
     refresh_token: {
       type: DataTypes.STRING,
     },
+    email_notif: {
+      type: DataTypes.BOOLEAN,
+    },
   },
   {
     freezeTablename: true,

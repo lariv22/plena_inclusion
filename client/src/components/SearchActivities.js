@@ -17,14 +17,13 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const SearchActivities = () => {
-  const [id, setId] = useState("");
-  const [idUser, setIdUser] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [ready, setReady] = useState(false);
   const [activitiesAvailable, setActivitiesAvailables] = useState([]);
   const [activitiesAvailableBetweenDates, setActivitiesAvailableBetweenDates] =
     useState([]);
+  const [msg, setMsg] = useState("");
 
   var curr = new Date();
   var date = curr.toISOString().substring(0, 10);
@@ -32,12 +31,9 @@ const SearchActivities = () => {
   const [startDate, setStartDate] = useState(date);
   date = curr.toISOString().substring(0, 10);
   const [endDate, setEndDate] = useState(date);
+  const [expire, setExpire] = useState("");
 
   const navigation = useNavigate();
-
-  useEffect(() => {
-    defaultDate();
-  }, []);
 
   const defaultDate = async () => {
     var curr = new Date();
@@ -48,11 +44,53 @@ const SearchActivities = () => {
     setEndDate(endDate);
   };
 
+  useEffect(() => {
+    defaultDate();
+  }, []);
+
+  const refreshToken = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/refreshToken");
+      localStorage.setItem("accessToken", response.data.accessToken);
+      console.log(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setExpire(decoded.exp);
+      return Promise.resolve();
+    } catch (error) {
+      if (error.response) {
+        navigation("/");
+      }
+    }
+  };
+
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      const token = localStorage.getItem("accessToken");
+      if (expire * 1000 < currentDate.getTime() || expire == undefined) {
+        config.headers.Authorization = `Bearer ${token}`;
+        const decoded = jwt_decode(token);
+        config.params = {
+          userId: decoded.userId,
+        };
+        setExpire(decoded.exp);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
   const GetActivitiesAvailableForUserWeek = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
-    const response = await axios
+    const response = await axiosJWT
       .post("/getActivitiesAvailableForUser", {
         userId,
         startDate: startDate,
@@ -60,6 +98,15 @@ const SearchActivities = () => {
       })
       .then((response) => {
         setActivitiesAvailables(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          GetActivitiesAvailableForUserWeek(new Event("click"));
+        }
       });
   };
 
@@ -67,7 +114,7 @@ const SearchActivities = () => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
-    const response = await axios
+    const response = await axiosJWT
       .post("/getActivitiesAvailableForUser", {
         userId,
         startDate: newStartDate,
@@ -75,6 +122,15 @@ const SearchActivities = () => {
       })
       .then((response) => {
         setActivitiesAvailableBetweenDates(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          GetActivitiesAvailableForUserDates(new Event("click"));
+        }
       });
   };
 
@@ -118,6 +174,15 @@ const SearchActivities = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Actividad:</span>{" "}
                   {activity.name}
+                </Card.Title>
+                <Card.Title>
+                  <span style={{ fontWeight: "bold" }}></span>{" "}
+                  <img
+                    src={activity.image}
+                    alt="new"
+                    height="200"
+                    width="200"
+                  />
                 </Card.Title>
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha inicio:</span>{" "}
@@ -179,6 +244,15 @@ const SearchActivities = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Actividad:</span>{" "}
                   {activity.name}
+                </Card.Title>
+                <Card.Title>
+                  <span style={{ fontWeight: "bold" }}></span>{" "}
+                  <img
+                    src={activity.image}
+                    alt="new"
+                    height="200"
+                    width="200"
+                  />
                 </Card.Title>
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha inicio:</span>{" "}

@@ -71,7 +71,21 @@ const Profile = () => {
     return () => (mounted = false);
   }, []);
 
-  const Auth2 = async (e) => {
+  const Logout = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.delete("/logout").then((response) => {
+        localStorage.removeItem("accessToken");
+        history("/login");
+      });
+    } catch (error) {
+      if (error.response) {
+        setMsg(error.response.data.msg);
+      }
+    }
+  };
+
+  const UpdateEmail = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
@@ -94,7 +108,7 @@ const Profile = () => {
     }
   };
 
-  const Auth3 = async (e) => {
+  const UpdatePassword = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
@@ -124,6 +138,16 @@ const Profile = () => {
           Perfil
         </h1>
       </div>
+      <form onSubmit={Logout} className="box">
+        <div className="field mt-5">
+          <button
+            className="button is-success is-fullwidth"
+            style={{ backgroundColor: "#2DA635" }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </form>
       <Row xs={10} md={7} className="g-4 mt-1 mb-5">
         <Col>
           {ready && (
@@ -180,7 +204,7 @@ const Profile = () => {
           {ready && (
             <div className="columns is-full">
               <div className="column is-4-desktop">
-                <form onSubmit={Auth2} className="box">
+                <form onSubmit={UpdateEmail} className="box">
                   <div className="field mt-5 has-text-centered">
                     <p className="has-text-centered" style={{ fontSize: 20 }}>
                       Modificar correo
@@ -219,7 +243,7 @@ const Profile = () => {
                 </form>
               </div>
               <div className="column is-4-desktop">
-                <form onSubmit={Auth3} className="box">
+                <form onSubmit={UpdatePassword} className="box">
                   <div className="field mt-5 has-text-centered">
                     <p className="has-text-centered" style={{ fontSize: 20 }}>
                       Modificar contraseña

@@ -13,31 +13,32 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [address, setAddress] = useState("");
+  const [special_needs, setSpecial_needs] = useState(0);
+  const [emerg_number, setEmerg_number] = useState("");
   const [disability, setDisability] = useState("");
+  const [email_notif, setEmail_notif] = useState(0);
   const [msg, setMsg] = useState("");
   const history = useNavigate();
 
   const Auth = async (e) => {
     e.preventDefault();
     try {
-      await axios
-        .post("/addParticipant", {
-          id: id,
-          name: nameUser,
-          surname1: surname1,
-          surname2: surname2,
-          DNI: DNI,
-          gender: gender,
-          phoneNumber: phoneNumber,
-          email: email,
-          birthDate: birthDate,
-          address: address,
-          disability: disability,
-        })
-        .then((response) => {
-          alert(response.data.msg);
-        });
-      history("/dashboard");
+      await axios.post("/addUser", {
+        name: nameUser,
+        surname1: surname1,
+        surname2: surname2,
+        DNI: DNI,
+        gender: gender,
+        phoneNumber: phoneNumber,
+        email: email,
+        birthDate: birthDate,
+        address: address,
+        special_needs: special_needs,
+        emerg_number: emerg_number,
+        disability: disability,
+        email_notif: email_notif,
+      });
+      history("/login");
     } catch (error) {
       if (error.response) {
         setMsg(error.response.data.msg);
@@ -53,23 +54,13 @@ const Register = () => {
               <form onSubmit={Auth} className="box">
                 <div className="field mt-5 has-text-centered">
                   <p className="has-text-centered" style={{ fontSize: 45 }}>
-                    PlenaInclusión
+                    Plena Inclusión Aragón
+                  </p>
+                  <p className="has-text-centered" style={{ fontSize: 30 }}>
+                    Formulario de registro
                   </p>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Id</label>
-                  <div className="controls">
-                    <input
-                      type="text"
-                      className="input"
-                      placeholder="id"
-                      value={id}
-                      onChange={(e) => setId(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="field mt-5">
-                  <label className="label">Nombre</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -81,7 +72,6 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Surname1</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -93,7 +83,6 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Surname2</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -105,7 +94,6 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">DNI</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -117,19 +105,19 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Genero</label>
                   <div className="controls">
-                    <input
-                      type="text"
-                      className="input"
-                      placeholder="Género"
+                    <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                    />
+                    >
+                      <option value="">Selecciona tu género</option>
+                      <option value="hombre">Hombre</option>
+                      <option value="mujer">Mujer</option>
+                      <option value="otro">Otro</option>
+                    </select>
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Telefono</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -141,7 +129,6 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Email</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -153,19 +140,19 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">FechaNac</label>
+                  <label className="label">
+                    Introduce tu fecha de nacimiento
+                  </label>
                   <div className="controls">
                     <input
-                      type="text"
+                      type="date"
                       className="input"
-                      placeholder="Fecha de nacimiento"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="field mt-5">
-                  <label className="label">Direccion</label>
                   <div className="controls">
                     <input
                       type="text"
@@ -177,14 +164,50 @@ const Register = () => {
                   </div>
                 </div>
                 <div className="field mt-5">
+                  <label className="label">¿Necesidades especiales?</label>
+                  <div className="controls">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={special_needs}
+                      onChange={(e) => setSpecial_needs(1)}
+                    />
+                  </div>
+                </div>
+                <div className="field mt-5">
+                  <label className="label">Número de emergencia</label>
+                  <div className="controls">
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="Número de móvil"
+                      value={emerg_number}
+                      onChange={(e) => setEmerg_number(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="field mt-5">
                   <label className="label">Discapacidad</label>
                   <div className="controls">
                     <input
                       type="text"
                       className="input"
                       placeholder="Discapacidad"
-                      value={address}
+                      value={disability}
                       onChange={(e) => setDisability(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="field mt-5">
+                  <label className="label">
+                    ¿Desea recibir notificaciones?
+                  </label>
+                  <div className="controls">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={email_notif}
+                      onChange={(e) => setEmail_notif(1)}
                     />
                   </div>
                 </div>
@@ -193,8 +216,13 @@ const Register = () => {
                     className="button is-success is-fullwidth"
                     style={{ backgroundColor: "#2DA635" }}
                   >
-                    Registrar participante
+                    Registrarme
                   </button>
+                </div>
+                <div className="links">
+                  <a className="link" href="/Login">
+                    ¿Ya tienes una cuenta?
+                  </a>
                 </div>
               </form>
             </div>

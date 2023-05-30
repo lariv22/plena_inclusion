@@ -11,9 +11,11 @@ import {
 
 import {
   Login,
+  Logout,
   GetUserData,
   UpdatePasswordUser,
   UpdateEmailUser,
+  AddUser,
 } from "../controllers/users.js";
 
 import { GetCategories } from "../controllers/categories.js";
@@ -25,6 +27,7 @@ import {
 
 import { verifyToken } from "../middleware/VerifyToken.js";
 import { refreshToken } from "../controllers/refreshToken.js";
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -32,20 +35,27 @@ router.get("/", (req, res) => {
 });
 
 router.post("/login", Login);
-router.post("/refreshToken", refreshToken);
-router.post("/getUserData", verifyToken, GetUserData);
-router.post("/updatePasswordUser", UpdatePasswordUser);
-router.post("/updateEmailUser", UpdateEmailUser);
+router.delete("/logout", Logout);
 
-router.post("/getActivities", GetActivities);
-router.post("/getActivitiesDate", GetActivitiesDate);
+router.post("/addUser", AddUser);
+router.get("/refreshToken", refreshToken);
+router.get("/getUserData", verifyToken, GetUserData);
+router.post("/updatePasswordUser", verifyToken, UpdatePasswordUser);
+router.post("/updateEmailUser", verifyToken, UpdateEmailUser);
 
-router.post("/getActivitiesOfUser", GetActivitiesOfUser);
-router.post("/addUserActivity", AddUserActivity);
-router.post("/deleteUserActivity", DeleteUserActivity);
-router.post("/getActivitiesAvailableForUser", GetActivitiesAvailableForUser);
+router.get("/getActivities", verifyToken, GetActivities);
+router.get("/getActivitiesDate", verifyToken, GetActivitiesDate);
 
-router.post("/getCategories", GetCategories);
+router.post("/getActivitiesOfUser", verifyToken, GetActivitiesOfUser);
+router.post("/addUserActivity", verifyToken, AddUserActivity);
+router.post("/deleteUserActivity", verifyToken, DeleteUserActivity);
+router.post(
+  "/getActivitiesAvailableForUser",
+  verifyToken,
+  GetActivitiesAvailableForUser
+);
+
+router.get("/getCategories", GetCategories);
 
 router.post("/addCatActivity", AddCatActivity);
 router.post("/deleteCatActivity", DeleteCatActivity);

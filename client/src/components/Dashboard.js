@@ -17,12 +17,13 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Dashboard = () => {
-  const [id, setId] = useState("");
-  const [idUser, setIdUser] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [activitiesOfUserWeek, setActivitiesOfUserWeek] = useState([]);
   const [activitiesOfUserDates, setActivitiesOfUserDates] = useState([]);
+  const [msg, setMsg] = useState("");
+  const [ready, setReady] = useState(false);
+  const [expire, setExpire] = useState("");
 
   var curr = new Date();
   var date = curr.toISOString().substring(0, 10);
@@ -36,6 +37,44 @@ const Dashboard = () => {
   useEffect(() => {
     defaultDate();
   }, []);
+
+  const refreshToken = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/refreshToken");
+      localStorage.setItem("accessToken", response.data.accessToken);
+      console.log(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setExpire(decoded.exp);
+      return Promise.resolve();
+    } catch (error) {
+      if (error.response) {
+        navigation("/");
+      }
+    }
+  };
+
+  const axiosJWT = axios.create();
+
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      const token = localStorage.getItem("accessToken");
+      if (expire * 1000 < currentDate.getTime() || expire == undefined) {
+        config.headers.Authorization = `Bearer ${token}`;
+        const decoded = jwt_decode(token);
+        config.params = {
+          userId: decoded.userId,
+        };
+        setExpire(decoded.exp);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   const defaultDate = async () => {
     var curr = new Date();
@@ -58,6 +97,15 @@ const Dashboard = () => {
       })
       .then((response) => {
         setActivitiesOfUserWeek(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          GetActivitiesOfUserWeek(new Event("click"));
+        }
       });
   };
 
@@ -66,13 +114,30 @@ const Dashboard = () => {
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     const response = await axios
-      .post("/getActivitiesOfUser", {
-        userId,
-        startDate: newStartDate,
-        endDate: newEndDate,
-      })
+      .post(
+        "/getActivitiesOfUser",
+        {
+          userId,
+          startDate: newStartDate,
+          endDate: newEndDate,
+        },
+        {
+          headers: {
+            authorization: "Bearer " + token,
+          },
+        }
+      )
       .then((response) => {
         setActivitiesOfUserDates(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          GetActivitiesOfUserDates(new Event("click"));
+        }
       });
   };
 
@@ -113,6 +178,15 @@ const Dashboard = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Actividad:</span>{" "}
                   {activity.name}
+                </Card.Title>
+                <Card.Title>
+                  <span style={{ fontWeight: "bold" }}></span>{" "}
+                  <img
+                    src={activity.image}
+                    alt="new"
+                    height="200"
+                    width="200"
+                  />
                 </Card.Title>
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha inicio:</span>{" "}
@@ -171,6 +245,15 @@ const Dashboard = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Actividad:</span>{" "}
                   {activity.name}
+                </Card.Title>
+                <Card.Title>
+                  <span style={{ fontWeight: "bold" }}></span>{" "}
+                  <img
+                    src={activity.image}
+                    alt="new"
+                    height="200"
+                    width="200"
+                  />
                 </Card.Title>
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha inicio:</span>{" "}

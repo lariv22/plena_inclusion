@@ -3,8 +3,8 @@ import db from "../config/database.js";
 
 const { DataTypes } = Sequelize;
 
-const Activities = db.define(
-  "activities",
+const Activity = db.define(
+  "activity",
   {
     name: {
       type: DataTypes.STRING(50),
@@ -13,7 +13,7 @@ const Activities = db.define(
       type: DataTypes.TEXT,
     },
     image: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(500),
     },
     dateStart: {
       type: DataTypes.DATEONLY,
@@ -31,4 +31,4 @@ const Activities = db.define(
   await db.sync();
 })();
 
-export default Activities;
+export default Activity;
