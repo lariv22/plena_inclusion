@@ -23,6 +23,7 @@ const SearchActivities = () => {
   const [activitiesAvailable, setActivitiesAvailables] = useState([]);
   const [activitiesAvailableBetweenDates, setActivitiesAvailableBetweenDates] =
     useState([]);
+  const [userActivity, setUserActivity] = useState([]);
   const [msg, setMsg] = useState("");
 
   var curr = new Date();
@@ -46,6 +47,8 @@ const SearchActivities = () => {
 
   useEffect(() => {
     defaultDate();
+    refreshToken();
+    GetActivitiesAvailableForUserWeek();
   }, []);
 
   const refreshToken = async () => {
@@ -86,8 +89,7 @@ const SearchActivities = () => {
     }
   );
 
-  const GetActivitiesAvailableForUserWeek = async (e) => {
-    e.preventDefault();
+  const GetActivitiesAvailableForUserWeek = async () => {
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     const response = await axiosJWT
@@ -134,6 +136,29 @@ const SearchActivities = () => {
       });
   };
 
+  const AddUserActivity = async (e, idActivity) => {
+    e.preventDefault();
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
+    const response = await axiosJWT
+      .post("/addUserActivity", {
+        userId,
+        idActivity: idActivity,
+      })
+      .then((response) => {
+        setUserActivity(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          AddUserActivity(new Event("click"));
+        }
+      });
+  };
+
   return (
     <div className="container mt-5 top">
       <div className="p-5 text-center">
@@ -150,19 +175,6 @@ const SearchActivities = () => {
               style={{ maxHeight: "100px" }}
               navbarScroll
             ></Nav>
-            <Form
-              className="d-flex"
-              onSubmit={GetActivitiesAvailableForUserWeek}
-            >
-              <Button
-                className="button is-success is-fullwidth"
-                variant="outline-success"
-                type="submit"
-                style={{ backgroundColor: "#2DA635" }}
-              >
-                Buscar próximas
-              </Button>
-            </Form>
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -191,6 +203,21 @@ const SearchActivities = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha final:</span>{" "}
                   {activity.dateEnd}
+                </Card.Title>
+                <Card.Title>
+                  <Form
+                    className="d-flex"
+                    onSubmit={AddUserActivity(activity.id)}
+                  >
+                    <Button
+                      className="button is-success is-fullwidth"
+                      variant="outline-success"
+                      type="submit"
+                      style={{ backgroundColor: "#2DA635" }}
+                    >
+                      Apuntarse
+                    </Button>
+                  </Form>
                 </Card.Title>
               </Card.Body>
             </Card>

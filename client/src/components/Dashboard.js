@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [newEndDate, setNewEndDate] = useState("");
   const [activitiesOfUserWeek, setActivitiesOfUserWeek] = useState([]);
   const [activitiesOfUserDates, setActivitiesOfUserDates] = useState([]);
+  const [userActivity, setUserActivity] = useState([]);
   const [msg, setMsg] = useState("");
   const [ready, setReady] = useState(false);
   const [expire, setExpire] = useState("");
@@ -35,7 +36,9 @@ const Dashboard = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
+    refreshToken();
     defaultDate();
+    GetActivitiesOfUserWeek();
   }, []);
 
   const refreshToken = async () => {
@@ -85,8 +88,7 @@ const Dashboard = () => {
     setEndDate(endDate);
   };
 
-  const GetActivitiesOfUserWeek = async (e) => {
-    e.preventDefault();
+  const GetActivitiesOfUserWeek = async () => {
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     const response = await axiosJWT
@@ -141,6 +143,28 @@ const Dashboard = () => {
       });
   };
 
+  const DeleteUserActivity = async (idActivity) => {
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
+    const response = await axiosJWT
+      .post("/deleteUserActivity", {
+        userId,
+        idActivity,
+      })
+      .then((response) => {
+        setUserActivity(response.data.arrayActivities);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+        if (error.response.status === 403) {
+          const RT = await refreshToken();
+          DeleteUserActivity(new Event("click"));
+        }
+      });
+  };
+
   return (
     <div className="container mt-5 top">
       <div className="p-5 text-center">
@@ -157,16 +181,6 @@ const Dashboard = () => {
               style={{ maxHeight: "100px" }}
               navbarScroll
             ></Nav>
-            <Form className="d-flex" onSubmit={GetActivitiesOfUserWeek}>
-              <Button
-                className="button is-success is-fullwidth"
-                variant="outline-success"
-                type="submit"
-                style={{ backgroundColor: "#2DA635" }}
-              >
-                Buscar próximas
-              </Button>
-            </Form>
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -195,6 +209,22 @@ const Dashboard = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha final:</span>{" "}
                   {activity.dateEnd}
+                </Card.Title>
+                <Card.Title>
+                  <Form
+                    className="d-flex"
+                    onSubmit={(e) => DeleteUserActivity(e, activity.id)}
+                  >
+                    <Button
+                      className="button is-success is-fullwidth"
+                      variant="outline-success"
+                      type="submit"
+                      onClick={(e) => DeleteUserActivity(e, activity.id)}
+                      style={{ backgroundColor: "#2DA635" }}
+                    >
+                      Desapuntarse
+                    </Button>
+                  </Form>
                 </Card.Title>
               </Card.Body>
             </Card>

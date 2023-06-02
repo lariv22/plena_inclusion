@@ -34,12 +34,14 @@ const Profile = () => {
     GetUserData();
   }, []);
 
+  const axiosJWT = axios.create();
+
   const GetUserData = async () => {
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
-    axios
+    axiosJWT
       .post("/getUserData", {
-        userId,
+        id: userId,
       })
       .then((response) => {
         setUserData(response.data.user);
@@ -50,8 +52,8 @@ const Profile = () => {
           setMsg(error.response.data.msg);
         }
         if (error.response.status === 403) {
-          const RT = await refreshToken();
-          GetUserData(new Event("firstTime"));
+          await refreshToken();
+          GetUserData();
         }
       });
   };
@@ -70,8 +72,6 @@ const Profile = () => {
       }
     }
   };
-
-  const axiosJWT = axios.create();
 
   axiosJWT.interceptors.request.use(
     async (config) => {

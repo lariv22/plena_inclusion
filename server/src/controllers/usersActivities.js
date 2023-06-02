@@ -99,10 +99,10 @@ export const DeleteUserActivity = async (req, res) => {
   try {
     await UserActivity.destroy({
       where: {
-        idUser: req.body.id,
+        idUser: req.body.userId,
       },
       where: {
-        idActivity: req.body.id,
+        idActivity: req.body.idActivity,
       },
     });
     res.json({ msg: "Participación borrada con éxito" });
