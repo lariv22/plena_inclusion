@@ -12,12 +12,16 @@ import Navbar from "../../node_modules/react-bootstrap/Navbar";
 import jwt_decode from "jwt-decode";
 
 const Profile = () => {
+  const [userData, setUserData] = useState({
+    userId: -1,
+    name: "",
+    email: "",
+  });
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [confEmail, setConfEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
-  const [userData, setUserData] = useState([]);
   const [msg, setMsg] = useState("");
   const history = useNavigate();
   const [ready, setReady] = useState(false);
@@ -26,53 +30,31 @@ const Profile = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
-    let mounted = true;
+    refreshToken();
+    GetUserData();
+  }, []);
+
+  const GetUserData = async () => {
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     axios
-      .post(
-        "/getUserData",
-        {
-          id: userId,
-        },
-        {
-          headers: {
-            authorization: "Bearer " + token,
-          },
-        }
-      )
+      .post("/getUserData", {
+        userId,
+      })
       .then((response) => {
         setUserData(response.data.user);
         setReady(true);
       })
-      .catch((error) => {
+      .catch(async (error) => {
         if (error.response) {
           setMsg(error.response.data.msg);
         }
         if (error.response.status === 403) {
-          axios.post("/refreshToken").then((response) => {
-            localStorage.setItem("accessToken", response.data.accessToken);
-            axios
-              .post(
-                "/getUserData",
-                {
-                  id: userId,
-                },
-                {
-                  headers: {
-                    authorization: "Bearer " + response.data.accessToken,
-                  },
-                }
-              )
-              .then((response) => {
-                setUserData(response.data.user);
-                setReady(true);
-              });
-          });
+          const RT = await refreshToken();
+          GetUserData(new Event("firstTime"));
         }
       });
-    return () => (mounted = false);
-  }, []);
+  };
 
   const refreshToken = async () => {
     try {
