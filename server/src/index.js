@@ -2,6 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import router from "./routes/index.js";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 

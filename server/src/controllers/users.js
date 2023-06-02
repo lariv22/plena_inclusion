@@ -60,7 +60,7 @@ export const GetUserData = async (req, res) => {
         "email_notif",
       ],
       where: {
-        id: req.body.id,
+        id: req.body.userId,
       },
     });
     res.json({ user });
@@ -84,14 +84,14 @@ export const Login = async (req, res) => {
     const email = user.email;
     const accessToken = jwt.sign(
       { userId, name, email },
-      "jsfgfjguwrg8783wgbjs849h2fu3cnsvh8wyr8fhwfvi2g225",
+      process.env.ACCESS_TOKEN_SECRET,
       {
         expiresIn: "15s",
       }
     );
     const refreshToken = jwt.sign(
       { userId, name, email },
-      "825y8i3hnfjmsbv7gwajbl7fobqrjfvbs7gbfj2q3bgh8f42",
+      process.env.REFRESH_TOKEN_SECRET,
       {
         expiresIn: "1d",
       }
