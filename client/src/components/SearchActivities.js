@@ -17,6 +17,7 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const SearchActivities = () => {
+  const [idActivity, setIdActivity] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [ready, setReady] = useState(false);
@@ -136,14 +137,14 @@ const SearchActivities = () => {
       });
   };
 
-  const AddUserActivity = async (e, idActivity) => {
+  const AddUserActivity = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     const response = await axiosJWT
       .post("/addUserActivity", {
         userId,
-        idActivity: idActivity,
+        idActivity,
       })
       .then((response) => {
         setUserActivity(response.data.arrayActivities);
@@ -157,7 +158,12 @@ const SearchActivities = () => {
           AddUserActivity(new Event("click"));
         }
       });
+      refreshPage();
   };
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
 
   return (
     <div className="container mt-5 top">
@@ -178,7 +184,7 @@ const SearchActivities = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Row xs={10} md={7} className="g-4 mt-1 mb-5">
+      <Row xs={10} md={7} className="g-4 mt-1 mb-5 d-inline-flex">
         {activitiesAvailable.map((activity) => (
           <Col key={activity.id}>
             <Card className={`box - shadow`}>
@@ -205,19 +211,20 @@ const SearchActivities = () => {
                   {activity.dateEnd}
                 </Card.Title>
                 <Card.Title>
-                  <Form
+                <Form
                     className="d-flex"
-                    onSubmit={AddUserActivity(activity.id)}
+                    onSubmit={AddUserActivity}
                   >
                     <Button
                       className="button is-success is-fullwidth"
                       variant="outline-success"
                       type="submit"
+                      onClick={() => setIdActivity(activity.id)}
                       style={{ backgroundColor: "#2DA635" }}
                     >
                       Apuntarse
                     </Button>
-                  </Form>
+                    </Form>
                 </Card.Title>
               </Card.Body>
             </Card>
@@ -263,7 +270,7 @@ const SearchActivities = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Row xs={10} md={7} className="g-4 mt-1 mb-5">
+      <Row xs={10} md={7} className="g-4 mt-1 mb-5 d-inline-flex">
         {activitiesAvailableBetweenDates.map((activity) => (
           <Col key={activity.id}>
             <Card className={`box - shadow`}>
@@ -288,6 +295,22 @@ const SearchActivities = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha final:</span>{" "}
                   {activity.dateEnd}
+                </Card.Title>
+                <Card.Title>
+                <Form
+                    className="d-flex"
+                    onSubmit={AddUserActivity}
+                  >
+                    <Button
+                      className="button is-success is-fullwidth"
+                      variant="outline-success"
+                      type="submit"
+                      onClick={() => setIdActivity(activity.id)}
+                      style={{ backgroundColor: "#2DA635" }}
+                    >
+                      Apuntarse
+                    </Button>
+                    </Form>
                 </Card.Title>
               </Card.Body>
             </Card>

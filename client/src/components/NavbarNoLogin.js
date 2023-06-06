@@ -3,7 +3,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Logo from "../plenaInclusion.png";
 
-function NavBar() {
+function NavBarNoLogin() {
   return (
     <>
       <Navbar bg="light" variant="light">
@@ -19,10 +19,7 @@ function NavBar() {
             Plena Inclusión
           </Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/Dashboard">Mis actividades</Nav.Link>
-            <Nav.Link href="/SearchActivities">Buscar actividades</Nav.Link>
             <Nav.Link href="/Register">Registrar</Nav.Link>
-            <Nav.Link href="/Profile">Perfil</Nav.Link>
             <Nav.Link href="/Login">Login</Nav.Link>
           </Nav>
         </Container>
@@ -31,4 +28,4 @@ function NavBar() {
   );
 }
 
-export default NavBar;
+export default NavBarNoLogin;

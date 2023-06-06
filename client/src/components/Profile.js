@@ -26,6 +26,7 @@ const Profile = () => {
   const history = useNavigate();
   const [ready, setReady] = useState(false);
   const [expire, setExpire] = useState("");
+  const [stateEmail, setStateEmail] = useState(false);
 
   const navigation = useNavigate();
 
@@ -138,6 +139,35 @@ const Profile = () => {
         }
       }
     }
+    refreshPage();
+  };
+
+  const UpdateEmailNotif = async (notif) => {
+    const token = localStorage.getItem("accessToken");
+    const { userId } = jwt_decode(token);
+    if (window.confirm("¿Seguro que quieres continuar?")) {
+      try {
+        const response = await axiosJWT
+          .post("/updateEmailNotifUser", {
+            id: userId,
+            email_notif: notif,
+          })
+          .catch(async (error) => {
+            if (error.response) {
+              setMsg(error.response.data.msg);
+            }
+            if (error.response.status === 403) {
+              const RT = await refreshToken();
+              UpdateEmailNotif(new Event("click"));
+            }
+          });
+      } catch (error) {
+        if (error.response) {
+          setMsg(error.response.data.msg);
+        }
+      }
+    }
+    refreshPage();
   };
 
   const UpdatePassword = async (e) => {
@@ -170,7 +200,12 @@ const Profile = () => {
         }
       }
     }
+    refreshPage();
   };
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
 
   return (
     <div className="container mt-5 top">
@@ -179,16 +214,6 @@ const Profile = () => {
           Perfil
         </h1>
       </div>
-      <form onSubmit={Logout} className="box">
-        <div className="field mt-5">
-          <button
-            className="button is-success is-fullwidth"
-            style={{ backgroundColor: "#2DA635" }}
-          >
-            Cerrar sesión
-          </button>
-        </div>
-      </form>
       <Row xs={10} md={7} className="g-4 mt-1 mb-5">
         <Col>
           {ready && (
@@ -235,6 +260,17 @@ const Profile = () => {
                   <span style={{ fontWeight: "bold" }}>Dirección:</span>{" "}
                   {userData.address}
                 </Card.Text>
+                <div className="form-check">
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      checked={userData.email_notif}
+                      onChange={() => UpdateEmailNotif(!userData.email_notif)}
+                      className="form-check-input"
+                    />
+                    Recibir notificaciones
+                  </label>
+                </div>
               </Card.Body>
             </Card>
           )}

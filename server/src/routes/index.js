@@ -15,6 +15,7 @@ import {
   GetUserData,
   UpdatePasswordUser,
   UpdateEmailUser,
+  UpdateEmailNotifUser,
   AddUser,
 } from "../controllers/users.js";
 
@@ -42,6 +43,7 @@ router.get("/refreshToken", refreshToken);
 router.post("/getUserData", verifyToken, GetUserData);
 router.post("/updatePasswordUser", verifyToken, UpdatePasswordUser);
 router.post("/updateEmailUser", verifyToken, UpdateEmailUser);
+router.post("/updateEmailNotifUser", verifyToken, UpdateEmailNotifUser);
 
 router.post("/getActivities", verifyToken, GetActivities);
 router.post("/getActivitiesDate", verifyToken, GetActivitiesDate);

@@ -12,11 +12,13 @@ import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import "../../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./style.css";
+import Carousel from "../../node_modules/react-bootstrap/Carousel";
 
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Dashboard = () => {
+  const [idActivity, setIdActivity] = useState("");
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [activitiesOfUserWeek, setActivitiesOfUserWeek] = useState([]);
@@ -143,7 +145,8 @@ const Dashboard = () => {
       });
   };
 
-  const DeleteUserActivity = async (idActivity) => {
+  const DeleteUserActivity = async (e) => {
+    e.preventDefault();
     const token = localStorage.getItem("accessToken");
     const { userId } = jwt_decode(token);
     const response = await axiosJWT
@@ -163,7 +166,12 @@ const Dashboard = () => {
           DeleteUserActivity(new Event("click"));
         }
       });
+    refreshPage();
   };
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
 
   return (
     <div className="container mt-5 top">
@@ -184,7 +192,7 @@ const Dashboard = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Row xs={10} md={7} className="g-4 mt-1 mb-5">
+      <Row xs={10} md={7} className="g-4 mt-1 mb-5 d-inline-flex">
         {activitiesOfUserWeek.map((activity) => (
           <Col key={activity.id}>
             <Card className={`box - shadow`}>
@@ -213,14 +221,14 @@ const Dashboard = () => {
                 <Card.Title>
                   <Form
                     className="d-flex"
-                    onSubmit={(e) => DeleteUserActivity(e, activity.id)}
+                    onSubmit={DeleteUserActivity}
                   >
                     <Button
-                      className="button is-success is-fullwidth"
+                      class="boton"
+                      className="button is-danger is-fullwidth"
                       variant="outline-success"
                       type="submit"
-                      onClick={(e) => DeleteUserActivity(e, activity.id)}
-                      style={{ backgroundColor: "#2DA635" }}
+                      onClick={() => setIdActivity(activity.id)}
                     >
                       Desapuntarse
                     </Button>
@@ -267,7 +275,7 @@ const Dashboard = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Row xs={10} md={7} className="g-4 mt-1 mb-5">
+      <Row xs={10} md={7} className="g-4 mt-1 mb-5 d-inline-flex">
         {activitiesOfUserDates.map((activity) => (
           <Col key={activity.id}>
             <Card className={`box - shadow`}>
@@ -292,6 +300,22 @@ const Dashboard = () => {
                 <Card.Title>
                   <span style={{ fontWeight: "bold" }}>Fecha final:</span>{" "}
                   {activity.dateEnd}
+                </Card.Title>
+                <Card.Title>
+                  <Form
+                    className="d-flex"
+                    onSubmit={DeleteUserActivity}
+                  >
+                    <Button
+                      class="boton"
+                      className="button is-danger is-fullwidth"
+                      variant="outline-success"
+                      type="submit"
+                      onClick={() => setIdActivity(activity.id)}
+                    >
+                      Desapuntarse
+                    </Button>
+                  </Form>
                 </Card.Title>
               </Card.Body>
             </Card>

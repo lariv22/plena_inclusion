@@ -4,10 +4,10 @@ import { Op } from "sequelize";
 import { Sequelize } from "sequelize";
 
 export const AddUserActivity = async (req, res) => {
-  const { idUser, idActivity } = req.body;
+  const { userId, idActivity } = req.body;
   try {
     await UserActivity.create({
-      idUser: idUser,
+      idUser: userId,
       idActivity: idActivity,
     });
     res.json({ msg: "El usuario se ha inscrito exitosamente!" });

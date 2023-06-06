@@ -4,6 +4,10 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import cron from "node-cron";
+import UserActivity from "../models/userActivityModel.js";
+import Activity from "../models/activityModel.js";
+import { Op } from "sequelize";
+import { Sequelize } from "sequelize";
 
 export const AddUser = async (req, res) => {
   try {
@@ -31,7 +35,8 @@ export const AddUser = async (req, res) => {
       email_notif: email_notif,
     });
     console.log(passwordUser);
-    EnviarEmailBienvenida(email, passwordUser);
+    // Llamamos a la funcion que mandara el email de bienvenida al nuevo usuario.
+    sendWelcomeEmail(email, passwordUser);
     res.json({
       msg: "Registrado exitosamente. Tu contraseña es: " + passwordUser,
     });
@@ -60,7 +65,7 @@ export const GetUserData = async (req, res) => {
         "email_notif",
       ],
       where: {
-        id: req.body.userId,
+        id: req.body.id,
       },
     });
     res.json({ user });
@@ -182,7 +187,9 @@ export const UpdatePasswordUser = async (req, res) => {
   }
 };
 
-export const EnviarEmailBienvenida = async (email, passwordUser) => {
+// Esta funcion se ejecuta cada vez que se registra un nuevo usuario y se encarga de mandarle
+// un email de bienvenida con su contraseña.
+export const sendWelcomeEmail = async (email, passwordUser) => {
   try {
     const mailOptions = {
       from: "ivanlarisa1999@gmail.com",
@@ -213,77 +220,104 @@ export const EnviarEmailBienvenida = async (email, passwordUser) => {
   }
 };
 
-// export const sendWeeklyEmail = async () => {
-//   try {
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail",
-//       auth: {
-//         user: "laikota@gmail.com",
-//         pass: "mxplypizpmagcook",
-//       },
-//       tls: {
-//         rejectUnauthorized: false,
-//       },
-//     });
-//     const activitiesUser = [];
-//     const users = await User.findAll({ where: {email_notif: true }});
-//     for(let i = 0; i < users.length; i++) {
-//       activitiesUser = await activities7Days(users.id);
-//       const mailOptions = {
-//         from: 'laikota@gmail.com',
-//         to: users.email,
-//         subject: 'Actividades de esta semana',
-//         text: 'Estas son tus actividades para esta semana: ' + activitiesUser.name + activitiesUser.startDate,
-//       };
-//       transporter.sendMail(mailOptions, (error, info) => {
-//         if (error) console.log(error);
-//         else console.log("Email enviado: " + info.response);
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+// Esta funcion se ejecuta semanalmente y envia emails a los usuarios que tienen activada
+// la casilla de notificaciones con informacion sobre las actividades que tienen en la
+// semana.
+export const sendWeeklyEmail = async () => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "laikota@gmail.com",
+        pass: "mxplypizpmagcook",
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+    let activitiesUser = [];
+    const users = await User.findAll({ where: {email_notif: true }});
+    for(let i = 0; i < users.length; i++) {
+      activitiesUser = await activities7Days(users[i].id);
+      // Creamos una variable para almacenar el texto con la informacion de las actividades
+      let activitiesText = "";
+      for(let j = 0; j < activitiesUser.length; j++){
+        activitiesText += `${activitiesUser[j].name} - ${activitiesUser[j].dateStart}` + "\n"
+      }
+      const mailOptions = {
+        from: 'laikota@gmail.com',
+        to: users[i].email,
+        subject: 'Actividades de esta semana',
+        text: 'Estas son tus actividades para esta semana:\n' + activitiesText,
+      };
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) console.log(error);
+        else console.log("Email enviado: " + info.response);
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-// export const activities7Days = async(userId) => {
-//   var curr = new Date();
-//   var date = curr.toISOString().substring(0, 10);
-//   curr.setDate(curr.getDate() + 7);
-//   const startDate = date;
-//   date = curr.toISOString().substring(0, 10);
-//   const endDate = date;
+export const activities7Days = async(userId) => {
+  var curr = new Date();
+  var date = curr.toISOString().substring(0, 10);
+  curr.setDate(curr.getDate() + 7);
+  const startDate = date;
+  date = curr.toISOString().substring(0, 10);
+  const endDate = date;
+  const arrayActivities = [];
+  try {
+    const activities = await UserActivity.findAll({
+      attributes: ["idActivity"],
+      where: {
+        idUser: userId,
+      },
+    });
+    for (let i = 0; i < activities.length; i++) {
+      const subActivities = await Activity.findOne({
+        attributes: ["id", "name", "dateStart"],
+        where: {
+          id: activities[i].idActivity,
+          dateStart: {
+            [Sequelize.Op.between]: [startDate, endDate],
+          },
+        },
+      });
+      if (subActivities !== null) {
+        arrayActivities.push(subActivities);
+      }
+    }
+    arrayActivities.sort(function (a, b) {
+      var c = new Date(a.dateStart);
+      var d = new Date(b.dateStart);
+      return c - d;
+    });
+    return arrayActivities;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-//   const arrayActivities = [];
-//   try {
-//     const activities = await UserActivity.findAll({
-//       attributes: ["idActivity"],
-//       where: {
-//         idUser: userId,
-//       },
-//     });
-//     for (let i = 0; i < activities.length; i++) {
-//       const subActivities = await Activity.findOne({
-//         attributes: ["id", "name", "dateStart"],
-//         where: {
-//           id: activities[i].idActivity,
-//           dateStart: {
-//             [Sequelize.Op.between]: [startDate, endDate],
-//           },
-//         },
-//       });
-//       if (subActivities !== null) {
-//         arrayActivities.push(subActivities);
-//       }
-//     }
-//     arrayActivities.sort(function (a, b) {
-//       var c = new Date(a.dateStart);
-//       var d = new Date(b.dateStart);
-//       return c - d;
-//     });
-//     return arrayActivities;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+// Asignamos un valor tambien a los segundos para que el metodo solo se ejecute una vez
+cron.schedule("00 51 21 * * SUN", sendWeeklyEmail);
 
-// cron.schedule("* 0 9 * * MON", sendWeeklyEmail);
+export const UpdateEmailNotifUser = async (req, res) => {
+  const { id, email_notif } = req.body;
+  console.log(req.body.id);
+  console.log(req.body.email_notif);
+  try {
+    const user = await User.update(
+      { email_notif: email_notif },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json({ msg: "Notificaciones cambiadas son éxito" });
+  } catch (error) {
+    console.log(error);
+  }
+};
